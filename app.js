@@ -8,8 +8,8 @@ const sendRequest= async(keyword)=>{
         $list.classList.remove('show');
         return;
     }
-    const open=await xhr.open("GET",`https://www.themealdb.com/api/json/v1/1/search.php?s=${keyword}`,true);
-    const respons= await xhr.send();
+    await xhr.open("GET",`https://www.themealdb.com/api/json/v1/1/search.php?s=${keyword}`,true);
+    await xhr.send();
     console.log('ajax 요청 보냄');
     xhr.onload=()=>{
         $list.innerHTML=``;
