@@ -2,6 +2,25 @@ const $input = document.querySelector('.search');
 const $list = document.querySelector('.list');
 let xhr = new XMLHttpRequest();
 
+const showKeyWord=(contents)=>{
+    $list.innerHTML=``;
+    let child;
+    $list.classList.add('show');
+    if(contents===null){
+        child = document.createElement('p');
+        child.innerText=`no result for ${keyword}`;
+        $list.appendChild(child);
+        return;
+    }
+    let maxLen= contents.length >5? 5:contents.length-1 ;
+    for(let i =0; i<=maxLen;i++){
+        child = document.createElement('p');
+        child.innerText=contents[i].strMeal;
+        $list.appendChild(child);
+    }
+
+}
+
 const sendRequest= async(keyword)=>{
     if(keyword.length===0){
         $list.innerHTML=``;
@@ -12,33 +31,21 @@ const sendRequest= async(keyword)=>{
     await xhr.send();
     console.log('ajax 요청 보냄');
     xhr.onload=()=>{
-        $list.innerHTML=``;
-        const contents=JSON.parse(xhr.responseText); 
-        // 최대 5개까지.
-        let child;
-        $list.classList.add('show');
-        if(contents.meals===null){
-            child = document.createElement('p');
-            child.innerText=`no result for ${keyword}`;
-            $list.appendChild(child);
-            return;
-        }
-        let maxLen= contents.meals.length >5? 5:contents.length-1 ;
-        for(let i =0; i<=maxLen;i++){
-            child = document.createElement('p');
-            child.innerText=contents.meals[i].strMeal;
-            $list.appendChild(child);
-        }
-
+        const contents=JSON.parse(xhr.responseText).meals; 
+        showKeyWord(contents);
     }
 }
 
-let timer;
-$input.addEventListener('input',(e)=>{
-    if(timer){
-        clearTimeout(timer); 
+const debouncing=(func,limit)=>{
+    let debouncing;
+    // debouncing 실행컨텍스트는 처음에 호출과 함께 종료되어서 event에 접근할 수 없음
+    return function(event){ // 이벤트 리스너의 콜백함수이므로 event 위임
+        const value=event.target.value;
+        if(debouncing){ // 900ms가 지나지 않았는데 input 이벤트가 들어왔다면
+            clearTimeout(debouncing); // 다시 900ms 세기 
+        }
+        debouncing=setTimeout(func.bind(this,value),limit); // Input 이벤트 발생후 최소 900ms 이후에 ajax 요청 보내기 
     }
-    timer = setTimeout(()=>{
-        sendRequest(e.target.value);
-    },900);
-});
+}
+
+$input.addEventListener('input', debouncing(sendRequest,900));
