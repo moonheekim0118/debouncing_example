@@ -37,14 +37,14 @@ const sendRequest= async(keyword)=>{
 }
 
 const debouncing=(func,limit)=>{
-    let debouncing;
+    let debounce;
     // debouncing 실행컨텍스트는 처음에 호출과 함께 종료되어서 event에 접근할 수 없음
     return function(event){ // 이벤트 리스너의 콜백함수이므로 event 위임
         const value=event.target.value;
-        if(debouncing){ // 900ms가 지나지 않았는데 input 이벤트가 들어왔다면
-            clearTimeout(debouncing); // 다시 900ms 세기 
+        if(debounce){ // 900ms가 지나지 않았는데 input 이벤트가 들어왔다면
+            clearTimeout(debounce); // 다시 900ms 세기 
         }
-        debouncing=setTimeout(func.bind(this,value),limit); // Input 이벤트 발생후 최소 900ms 이후에 ajax 요청 보내기 
+        debounce=setTimeout(func.bind(this,value),limit); // Input 이벤트 발생후 최소 900ms 이후에 ajax 요청 보내기 
     }
 }
 
